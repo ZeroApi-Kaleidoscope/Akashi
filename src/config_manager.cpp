@@ -342,16 +342,6 @@ QString ConfigManager::motd()
     return m_settings->value("Options/motd", "MOTD not set").toString();
 }
 
-bool ConfigManager::webaoEnabled()
-{
-    return m_settings->value("Options/webao_enable", false).toBool();
-}
-
-int ConfigManager::webaoPort()
-{
-    return m_settings->value("Options/webao_port", 27017).toInt();
-}
-
 DataTypes::AuthType ConfigManager::authType()
 {
     QString l_auth = m_settings->value("Options/auth", "simple").toString().toUpper();

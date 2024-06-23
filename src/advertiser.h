@@ -89,11 +89,6 @@ class Advertiser : public QObject
     int m_port;
 
     /**
-     * @brief Websocket proxy port for WebAO users.
-     */
-    int m_ws_port;
-
-    /**
      * @brief Maximum amount of clients that can be connected to the server.
      */
     int m_players;

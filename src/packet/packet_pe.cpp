@@ -1,4 +1,6 @@
 #include "packet/packet_pe.h"
+
+#include "area_data.h"
 #include "server.h"
 
 #include <QDebug>

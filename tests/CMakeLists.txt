@@ -15,8 +15,8 @@ function(declare_server_test partial_test_id)
 
   add_executable(${test_id} ${ARGN})
 
-  target_compile_definitions(${test_id} PRIVATE KAL_AKASHI_TEST_DATA_PATH="${CMAKE_CURRENT_SOURCE_DIR}/data")
-  target_link_libraries(${test_id} PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Test kaleidoscope-akashi)
+  target_compile_definitions(${test_id} PRIVATE KAL_AKASHI_TEST_DATA_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resource")
+  target_link_libraries(${test_id} PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Test akashi)
 
   if(WIN32)
     set_target_properties(${test_id} PROPERTIES WIN32_EXECUTABLE TRUE)

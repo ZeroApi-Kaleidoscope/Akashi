@@ -1,4 +1,6 @@
 #include "packet/packet_rd.h"
+
+#include "area_data.h"
 #include "config_manager.h"
 #include "server.h"
 

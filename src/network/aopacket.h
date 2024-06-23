@@ -23,11 +23,10 @@
 #include <QString>
 #include <QStringList>
 
-#include "aoclient.h"
-#include "area_data.h"
 #include "packet/packet_info.h"
 
 class AOClient;
+class AreaData;
 
 /**
  * @brief An Attorney Online 2 compatible packet.

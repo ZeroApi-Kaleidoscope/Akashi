@@ -1,4 +1,6 @@
 #include "packet/packet_rt.h"
+
+#include "area_data.h"
 #include "packet/packet_factory.h"
 #include "server.h"
 
