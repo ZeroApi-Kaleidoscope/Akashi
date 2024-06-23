@@ -1,10 +1,12 @@
 #include "packet/packet_ct.h"
+
 #include "akashidefs.h"
 #include "config_manager.h"
 #include "packet/packet_factory.h"
 #include "server.h"
 
 #include <QDebug>
+#include <QRegularExpression>
 
 PacketCT::PacketCT(QStringList &contents) :
     AOPacket(contents)
@@ -27,8 +29,8 @@ void PacketCT::handlePacket(AreaData *area, AOClient &client) const
         return;
     }
 
-    client.setName(client.dezalgo(m_content[0]).replace(QRegExp("\\[|\\]|\\{|\\}|\\#|\\$|\\%|\\&"), "")); // no fucky wucky shit here
-    if (client.name().isEmpty() || client.name() == ConfigManager::serverName())                          // impersonation & empty name protection
+    client.setName(client.dezalgo(m_content[0]).replace(QRegularExpression("\\[|\\]|\\{|\\}|\\#|\\$|\\%|\\&"), "")); // no fucky wucky shit here
+    if (client.name().isEmpty() || client.name() == ConfigManager::serverName())                                     // impersonation & empty name protection
         return;
 
     if (client.name().length() > 30) {
@@ -53,11 +55,11 @@ void PacketCT::handlePacket(AreaData *area, AOClient &client) const
         int l_cmd_argc = l_cmd_argv.length();
 
         client.handleCommand(l_command, l_cmd_argc, l_cmd_argv);
-        emit client.logCMD((client.character() + " " + client.characterName()), client.m_ipid, client.name(), l_command, l_cmd_argv, client.getServer()->getAreaById(client.areaId())->name());
+        Q_EMIT client.logCMD((client.character() + " " + client.characterName()), client.m_ipid, client.name(), l_command, l_cmd_argv, client.getServer()->getAreaById(client.areaId())->name());
         return;
     }
     else {
         client.getServer()->broadcast(final_packet, client.areaId());
     }
-    emit client.logOOC((client.character() + " " + client.characterName()), client.name(), client.m_ipid, area->name(), l_message);
+    Q_EMIT client.logOOC((client.character() + " " + client.characterName()), client.name(), client.m_ipid, area->name(), l_message);
 }

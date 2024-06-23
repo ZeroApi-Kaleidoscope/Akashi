@@ -30,6 +30,8 @@
 #include "network/network_socket.h"
 #include "packet/packet_factory.h"
 
+#include <QRegularExpression>
+
 Server::Server(int p_port, int p_ws_port, QObject *parent) :
     QObject(parent),
     port(p_port),
@@ -102,7 +104,7 @@ void Server::start()
         connect(AdvertiserTimer, &QTimer::timeout, ms3_Advertiser, &Advertiser::msAdvertiseServer);
         connect(this, &Server::playerCountUpdated, ms3_Advertiser, &Advertiser::updatePlayerCount);
         connect(this, &Server::updateHTTPConfiguration, ms3_Advertiser, &Advertiser::updateAdvertiserSettings);
-        emit playerCountUpdated(m_player_count);
+        Q_EMIT playerCountUpdated(m_player_count);
         ms3_Advertiser->msAdvertiseServer();
         AdvertiserTimer->start(300000);
     }
@@ -245,7 +247,7 @@ void Server::clientConnected()
     AOPacket *decryptor = PacketFactory::createPacket("decryptor", {"NOENCRYPT"});
     client->sendPacket(decryptor);
     hookupAOClient(client);
-#ifdef NET_DEBUG
+#ifdef KAL_AKASHI_DEBUG_NETWORK
     qDebug() << client->m_remote_ip.toString() << "connected";
 #endif
 }
@@ -395,8 +397,8 @@ QHostAddress Server::parseToIPv4(QHostAddress f_remote_ip)
 void Server::reloadSettings()
 {
     ConfigManager::reloadSettings();
-    emit reloadRequest(ConfigManager::serverName(), ConfigManager::serverDescription());
-    emit updateHTTPConfiguration();
+    Q_EMIT reloadRequest(ConfigManager::serverName(), ConfigManager::serverDescription());
+    Q_EMIT updateHTTPConfiguration();
     handleDiscordIntegration();
     logger->loadLogtext();
     m_ipban_list = ConfigManager::iprangeBans();
@@ -519,11 +521,13 @@ QString Server::getCharacterById(int f_chr_id)
 
 int Server::getCharID(QString char_name)
 {
-    for (const QString &character : qAsConst(m_characters)) {
-        if (character.toLower() == char_name.toLower()) {
-            return m_characters.indexOf(QRegExp(character, Qt::CaseInsensitive, QRegExp::FixedString));
+    char_name = char_name.toLower();
+    for (int i = 0; i < m_characters.length(); i++) {
+        if (m_characters.at(i).toLower() == char_name) {
+            return i;
         }
     }
+
     return -1; // character does not exist
 }
 
@@ -642,13 +646,13 @@ void Server::hookupAOClient(AOClient *client)
 void Server::increasePlayerCount()
 {
     m_player_count++;
-    emit playerCountUpdated(m_player_count);
+    Q_EMIT playerCountUpdated(m_player_count);
 }
 
 void Server::decreasePlayerCount()
 {
     m_player_count--;
-    emit playerCountUpdated(m_player_count);
+    Q_EMIT playerCountUpdated(m_player_count);
 }
 
 bool Server::isIPBanned(QHostAddress f_remote_IP)

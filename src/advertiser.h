@@ -39,7 +39,7 @@ class Advertiser : public QObject
      */
     ~Advertiser();
 
-  public slots:
+  public Q_SLOTS:
 
     /**
      * @brief Establishes a connection with masterserver to register or update the listing on the masterserver.

@@ -335,7 +335,7 @@ class Server : public QObject
      */
     QHostAddress parseToIPv4(QHostAddress f_remote_ip);
 
-  public slots:
+  public Q_SLOTS:
     /**
      * @brief Convenience class to call a reload of available configuraiton elements.
      */
@@ -369,7 +369,7 @@ class Server : public QObject
      */
     void markIDFree(const int &f_user_id);
 
-  signals:
+  Q_SIGNALS:
 
     /**
      * @brief Sends the server name and description, emitted by /reload.
@@ -561,7 +561,7 @@ class Server : public QObject
      **/
     void hookupAOClient(AOClient *client);
 
-  private slots:
+  private Q_SLOTS:
     /**
      * @brief Increase the current player count by one.
      */

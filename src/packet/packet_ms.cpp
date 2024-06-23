@@ -1,9 +1,11 @@
 #include "packet/packet_ms.h"
+
 #include "config_manager.h"
 #include "packet/packet_factory.h"
 #include "server.h"
 
 #include <QDebug>
+#include <QRegularExpression>
 
 PacketMS::PacketMS(QStringList &contents) :
     AOPacket(contents)
@@ -38,7 +40,7 @@ void PacketMS::handlePacket(AreaData *area, AOClient &client) const
         validated_packet->setContentField(5, client.m_pos);
 
     client.getServer()->broadcast(validated_packet, client.areaId());
-    emit client.logIC((client.character() + " " + client.characterName()), client.name(), client.m_ipid, client.getServer()->getAreaById(client.areaId())->name(), client.m_last_message);
+    Q_EMIT client.logIC((client.character() + " " + client.characterName()), client.name(), client.m_ipid, client.getServer()->getAreaById(client.areaId())->name(), client.m_last_message);
     area->updateLastICMessage(validated_packet->getContent());
 
     area->startMessageFloodguard(ConfigManager::messageFloodguard());
@@ -153,7 +155,7 @@ AOPacket *PacketMS::validateIcPacket(AOClient &client) const
     }
 
     if (client.m_is_disemvoweled) {
-        QString l_disemvoweled_message = l_incoming_msg.remove(QRegExp("[AEIOUaeiou]"));
+        QString l_disemvoweled_message = l_incoming_msg.remove(QRegularExpression("[AEIOUaeiou]"));
         l_incoming_msg = l_disemvoweled_message;
     }
 

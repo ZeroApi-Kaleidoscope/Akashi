@@ -77,7 +77,7 @@ class NetworkSocket : public QObject
      */
     void write(AOPacket *f_packet);
 
-  signals:
+  Q_SIGNALS:
 
     /**
      * @brief handlePacket
@@ -90,7 +90,7 @@ class NetworkSocket : public QObject
      */
     void clientDisconnected();
 
-  private slots:
+  private Q_SLOTS:
     /**
      * @brief Handles the reading and processing of TCP stream data.
      *
