@@ -25,8 +25,6 @@
 #include <QSettings>
 #include <QStack>
 #include <QString>
-#include <QTcpServer>
-#include <QTcpSocket>
 #include <QTimer>
 #include <QWebSocket>
 #include <QWebSocketServer>
@@ -57,11 +55,10 @@ class Server : public QObject
     /**
      * @brief Creates a Server instance.
      *
-     * @param p_port The TCP port to listen for connections on.
-     * @param p_ws_port The WebSocket port to listen for connections on.
+     * @param p_port The port to listen for connections on.
      * @param parent Qt-based parent, passed along to inherited constructor from QObject.
      */
-    Server(int p_port, int p_ws_port, QObject *parent = nullptr);
+    Server(int p_port, QObject *parent = nullptr);
 
     /**
      * @brief Destructor for the Server class.
@@ -335,7 +332,7 @@ class Server : public QObject
      */
     QHostAddress parseToIPv4(QHostAddress f_remote_ip);
 
-  public slots:
+  public Q_SLOTS:
     /**
      * @brief Convenience class to call a reload of available configuraiton elements.
      */
@@ -350,14 +347,6 @@ class Server : public QObject
     void clientConnected();
 
     /**
-     * @brief Handles a new connection.
-     *
-     * @details The function creates an AOClient to represent the user, assigns a user ID to them, and
-     * checks if the client is banned.
-     */
-    void ws_clientConnected();
-
-    /**
      * @brief Method to construct and reconstruct Discord Webhook Integration.
      *
      * @details Constructs or rebuilds Discord Object during server startup and configuration reload.
@@ -369,7 +358,7 @@ class Server : public QObject
      */
     void markIDFree(const int &f_user_id);
 
-  signals:
+  Q_SIGNALS:
 
     /**
      * @brief Sends the server name and description, emitted by /reload.
@@ -429,14 +418,9 @@ class Server : public QObject
     WSProxy *proxy;
 
     /**
-     * @brief Listens for incoming TCP connections.
-     */
-    QTcpServer *server;
-
-    /**
      * @brief Listens for incoming websocket connections.
      */
-    QWebSocketServer *ws_server;
+    QWebSocketServer *m_listener;
 
     /**
      * @brief Handles Discord webhooks.
@@ -467,11 +451,6 @@ class Server : public QObject
      * @brief The port through which the server will accept TCP connections.
      */
     int port;
-
-    /**
-     * @brief The port through which the server will accept WebSocket connections.
-     */
-    int ws_port;
 
     /**
      * @brief The collection of all currently connected clients.
@@ -561,7 +540,7 @@ class Server : public QObject
      **/
     void hookupAOClient(AOClient *client);
 
-  private slots:
+  private Q_SLOTS:
     /**
      * @brief Increase the current player count by one.
      */

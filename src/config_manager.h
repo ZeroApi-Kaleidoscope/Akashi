@@ -165,20 +165,6 @@ class ConfigManager
     static QString motd();
 
     /**
-     * @brief Returns true if the server should accept webAO connections.
-     *
-     * @return See short description.
-     */
-    static bool webaoEnabled();
-
-    /**
-     * @brief Returns the port to listen for webAO connections on.
-     *
-     * @return See short description.
-     */
-    static int webaoPort();
-
-    /**
      * @brief Returns the server's authorization type.
      *
      * @return See short description.

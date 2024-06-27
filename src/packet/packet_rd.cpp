@@ -1,4 +1,6 @@
 #include "packet/packet_rd.h"
+
+#include "area_data.h"
 #include "config_manager.h"
 #include "server.h"
 
@@ -61,7 +63,7 @@ void PacketRD::handlePacket(AreaData *area, AOClient &client) const
             client.sendPacket("TI", {QString::number(l_timer_id), "3"});
         }
     }
-    emit client.joined();
+    Q_EMIT client.joined();
     area->addClient(-1, client.clientId());
     client.arup(client.ARUPType::PLAYER_COUNT, true); // Tell everyone there is a new player
 }

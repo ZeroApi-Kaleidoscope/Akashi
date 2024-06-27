@@ -39,7 +39,7 @@ class Advertiser : public QObject
      */
     ~Advertiser();
 
-  public slots:
+  public Q_SLOTS:
 
     /**
      * @brief Establishes a connection with masterserver to register or update the listing on the masterserver.
@@ -87,11 +87,6 @@ class Advertiser : public QObject
      * @brief Client port for the AO2-Client.
      */
     int m_port;
-
-    /**
-     * @brief Websocket proxy port for WebAO users.
-     */
-    int m_ws_port;
 
     /**
      * @brief Maximum amount of clients that can be connected to the server.

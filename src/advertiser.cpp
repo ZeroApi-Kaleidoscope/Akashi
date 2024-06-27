@@ -28,15 +28,15 @@ Advertiser::Advertiser()
     m_name = ConfigManager::serverName();
     m_hostname = ConfigManager::advertiserHostname();
     m_description = ConfigManager::serverDescription();
-    m_port = ConfigManager::serverPort();
 
     // Cheap workaround to correctly advertise when Cloudflare tunnel is used.
     if (ConfigManager::advertiserCloudflareMode()) {
-        m_ws_port = 80;
+        m_port = 80;
     }
     else {
-        m_ws_port = ConfigManager::webaoPort();
+        m_port = ConfigManager::serverPort();
     }
+
     m_masterserver = ConfigManager::advertiserIP();
     m_debug = ConfigManager::advertiserDebug();
 }
@@ -61,10 +61,6 @@ void Advertiser::msAdvertiseServer()
         }
 
         l_json["port"] = m_port;
-        if (m_ws_port != -1) {
-            l_json["ws_port"] = m_ws_port;
-        }
-
         l_json["players"] = m_players;
         l_json["name"] = m_name;
 

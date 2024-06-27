@@ -1,5 +1,6 @@
 #include "packet/packet_hp.h"
-#include "akashiutils.h"
+
+#include "area_data.h"
 #include "packet/packet_factory.h"
 #include "server.h"
 

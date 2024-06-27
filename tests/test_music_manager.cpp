@@ -1,25 +1,27 @@
-#include <QTest>
-
 #include "music_manager.h"
 
-namespace tests {
-namespace unittests {
+#include <QTest>
 
 /**
  * @brief Unit Tester class for the musiclist-related functions.
  */
-class MusicListManager : public QObject
+class test_MusicManager : public QObject
 {
     Q_OBJECT
 
   public:
     MusicManager *m_music_manager;
 
-  private slots:
+  private Q_SLOTS:
     /**
      * @brief Initialises every tests with creating a new MusicManager with a small sample root list.
      */
     void init();
+
+    void cleanup()
+    {
+        m_music_manager->deleteLater();
+    }
 
     /**
      * @brief Tests the registration of areas in the music manager.
@@ -72,7 +74,7 @@ class MusicListManager : public QObject
     void musiclist();
 };
 
-void MusicListManager::init()
+void test_MusicManager::init()
 {
     QMap<QString, QPair<QString, int>> l_test_list;
     l_test_list.insert("==Music==", {"==Music==", 0});
@@ -84,10 +86,10 @@ void MusicListManager::init()
            << "Announce The Truth (AJ).opus"
            << "Announce The Truth (JFA).opus";
 
-    m_music_manager = new MusicManager({"my.cdn.com", "your.cdn.com"}, l_test_list, l_list, nullptr);
+    m_music_manager = new MusicManager({"my.cdn.com", "your.cdn.com"}, l_test_list, l_list);
 }
 
-void MusicListManager::registerArea()
+void test_MusicManager::registerArea()
 {
     {
         // We register a single area with the music manager of ID 0.
@@ -103,7 +105,7 @@ void MusicListManager::registerArea()
     }
 }
 
-void MusicListManager::toggleRootEnabled()
+void test_MusicManager::toggleRootEnabled()
 {
     {
         // We register an area of ID0 and toggle the inclusion of global list.
@@ -117,7 +119,7 @@ void MusicListManager::toggleRootEnabled()
     }
 }
 
-void MusicListManager::validateSong_data()
+void test_MusicManager::validateSong_data()
 {
     // Songname can also be the realname.
     QTest::addColumn<QString>("songname");
@@ -135,7 +137,7 @@ void MusicListManager::validateSong_data()
     QTest::addRow("URL - Subdomain Attack") << "https://my.cdn.com.fakedomain.com/mysong.opus" << false;
 }
 
-void MusicListManager::validateSong()
+void test_MusicManager::validateSong()
 {
     QFETCH(QString, songname);
     QFETCH(bool, expectedResult);
@@ -144,7 +146,7 @@ void MusicListManager::validateSong()
     QCOMPARE(expectedResult, l_result);
 }
 
-void MusicListManager::addCustomSong()
+void test_MusicManager::addCustomSong()
 {
     {
         // Dummy register.
@@ -182,7 +184,7 @@ void MusicListManager::addCustomSong()
     }
 }
 
-void MusicListManager::addCustomCategory()
+void test_MusicManager::addCustomCategory()
 {
     {
         // Dummy register.
@@ -218,7 +220,7 @@ void MusicListManager::addCustomCategory()
     }
 }
 
-void MusicListManager::sanitiseCustomList()
+void test_MusicManager::sanitiseCustomList()
 {
     // Prepare a dummy area with root list disabled.Insert both non-root and root elements.
     m_music_manager->registerArea(0);
@@ -238,7 +240,7 @@ void MusicListManager::sanitiseCustomList()
     QCOMPARE(m_music_manager->musiclist(0).at(4), "mysong.opus");
 }
 
-void MusicListManager::removeCategorySong()
+void test_MusicManager::removeCategorySong()
 {
     {
         // Prepare dummy area. Add both custom songs and categories.
@@ -275,7 +277,7 @@ void MusicListManager::removeCategorySong()
     }
 }
 
-void MusicListManager::songInformation()
+void test_MusicManager::songInformation()
 {
     {
         // Prepare dummy area. Add both custom songs and categories.
@@ -297,7 +299,7 @@ void MusicListManager::songInformation()
     }
 }
 
-void MusicListManager::musiclist()
+void test_MusicManager::musiclist()
 {
     {
         // Prepare dummy area. Add both custom songs and categories.
@@ -312,9 +314,6 @@ void MusicListManager::musiclist()
     }
 }
 
-}
-}
+QTEST_APPLESS_MAIN(test_MusicManager)
 
-QTEST_APPLESS_MAIN(tests::unittests::MusicListManager)
-
-#include "tst_unittest_music_manager.moc"
+#include "test_music_manager.moc"

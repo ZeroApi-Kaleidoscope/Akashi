@@ -54,7 +54,9 @@ bool ConfigManager::verifyServerConfig()
 
     // Verify areas
     QSettings l_areas_ini("config/areas.ini", QSettings::IniFormat);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     l_areas_ini.setIniCodec("UTF-8");
+#endif
     if (l_areas_ini.childGroups().length() < 1) {
         qCritical() << "areas.ini is invalid!";
         return false;
@@ -338,16 +340,6 @@ QString ConfigManager::serverName()
 QString ConfigManager::motd()
 {
     return m_settings->value("Options/motd", "MOTD not set").toString();
-}
-
-bool ConfigManager::webaoEnabled()
-{
-    return m_settings->value("Options/webao_enable", false).toBool();
-}
-
-int ConfigManager::webaoPort()
-{
-    return m_settings->value("Options/webao_port", 27017).toInt();
 }
 
 DataTypes::AuthType ConfigManager::authType()

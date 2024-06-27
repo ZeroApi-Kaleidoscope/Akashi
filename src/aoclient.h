@@ -609,7 +609,7 @@ class AOClient : public QObject
      */
     const int SPECTATOR_ID = -1;
 
-  public slots:
+  public Q_SLOTS:
     /**
      * @brief Handles an incoming packet, checking for authorisation and minimum argument count.
      *
@@ -644,7 +644,7 @@ class AOClient : public QObject
      */
     void onAfkTimeout();
 
-  signals:
+  Q_SIGNALS:
     /**
      * @brief This signal is emitted when the client has completed the participation handshake.
      */
@@ -2103,7 +2103,7 @@ class AOClient : public QObject
      */
     int last_read = 0;
 
-  signals:
+  Q_SIGNALS:
 
     /**
      * @brief Signal connected to universal logger. Sends IC chat usage to the logger.

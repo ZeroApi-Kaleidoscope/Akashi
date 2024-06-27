@@ -1,4 +1,6 @@
 #include "packet/packet_zz.h"
+
+#include "area_data.h"
 #include "config_manager.h"
 #include "packet/packet_factory.h"
 #include "server.h"
@@ -39,7 +41,7 @@ void PacketZZ::handlePacket(AreaData *area, AOClient &client) const
         if (l_client->m_authenticated)
             l_client->sendPacket(PacketFactory::createPacket("ZZ", {l_modcallNotice}));
     }
-    emit client.logModcall((client.character() + " " + client.characterName()), client.m_ipid, client.name(), client.getServer()->getAreaById(client.areaId())->name());
+    Q_EMIT client.logModcall((client.character() + " " + client.characterName()), client.m_ipid, client.name(), client.getServer()->getAreaById(client.areaId())->name());
 
     if (ConfigManager::discordModcallWebhookEnabled()) {
         QString l_name = client.name();
@@ -47,6 +49,6 @@ void PacketZZ::handlePacket(AreaData *area, AOClient &client) const
             l_name = client.character();
 
         QString l_areaName = area->name();
-        emit client.getServer()->modcallWebhookRequest(l_name, l_areaName, m_content.value(0), client.getServer()->getAreaBuffer(l_areaName));
+        Q_EMIT client.getServer()->modcallWebhookRequest(l_name, l_areaName, m_content.value(0), client.getServer()->getAreaBuffer(l_areaName));
     }
 }

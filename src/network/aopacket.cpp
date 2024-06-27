@@ -17,6 +17,8 @@
 //////////////////////////////////////////////////////////////////////////////////////
 #include "network/aopacket.h"
 
+#include "aoclient.h"
+#include "area_data.h"
 #include "packet/packet_askchaa.h"
 #include "packet/packet_casea.h"
 #include "packet/packet_cc.h"

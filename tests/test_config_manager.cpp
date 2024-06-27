@@ -1,28 +1,24 @@
+#include "config_manager.h"
+
 #include <QString>
 #include <QTest>
 
-#include "config_manager.h"
-
-namespace tests {
-namespace unittests {
-
-class tst_ConfigManager : public QObject
+class test_ConfigManager : public QObject
 {
-
     Q_OBJECT
 
     typedef QMap<QString, QPair<QString, int>> MusicList;
 
-  private slots:
+  private:
+    ConfigManager *m_config = nullptr;
 
-    /**
-     * @brief Tests if the config folder is complete. Fails when a config file is missing.
-     */
+  private Q_SLOTS:
+    void init() { m_config = new ConfigManager; }
+
+    void cleanup() { delete m_config; }
+
     void verifyServerConfig();
 
-    /**
-     * @brief Retrieves the IPs the servers binds to in string format
-     */
     void bindIP();
 
     void charlist();
@@ -143,7 +139,10 @@ class tst_ConfigManager : public QObject
     void advertiserCloudflareMode();
 };
 
-void tst_ConfigManager::verifyServerConfig()
+/**
+ * @brief Tests if the config folder is complete. Fails when a config file is missing.
+ */
+void test_ConfigManager::verifyServerConfig()
 {
     // If the sample folder is not renamed or a file is missing, we fail the test.
     QCOMPARE(ConfigManager::verifyServerConfig(), true);
@@ -164,12 +163,15 @@ void tst_ConfigManager::verifyServerConfig()
     }
 }
 
-void tst_ConfigManager::bindIP()
+/**
+ * @brief Retrieves the IPs the servers binds to in string format
+ */
+void test_ConfigManager::bindIP()
 {
     QCOMPARE(ConfigManager::bindIP(), "all");
 }
 
-void tst_ConfigManager::charlist()
+void test_ConfigManager::charlist()
 {
     // We check that the list is unsorted and exactly as defined in the text file.
     QStringList l_characters = ConfigManager::charlist();
@@ -180,7 +182,7 @@ void tst_ConfigManager::charlist()
     QCOMPARE(l_characters.at(4), "Diego");
 }
 
-void tst_ConfigManager::backgrounds()
+void test_ConfigManager::backgrounds()
 {
     // We check that the list is unsorted and exactly as defined in the text file.
     QStringList l_backgrounds = ConfigManager::backgrounds();
@@ -192,7 +194,7 @@ void tst_ConfigManager::backgrounds()
     QCOMPARE(l_backgrounds.at(4), "Christmas");
 }
 
-void tst_ConfigManager::musiclist()
+void test_ConfigManager::musiclist()
 {
     MusicList l_musiclist = ConfigManager::musiclist();
     qDebug() << l_musiclist;
@@ -210,7 +212,7 @@ void tst_ConfigManager::musiclist()
     QCOMPARE(l_contents.second, 98);
 }
 
-void tst_ConfigManager::ordered_songs()
+void test_ConfigManager::ordered_songs()
 {
     QStringList l_ordered_musiclist = ConfigManager::ordered_songs();
     QCOMPARE(l_ordered_musiclist.at(0), "==Samplelist==");
@@ -219,7 +221,7 @@ void tst_ConfigManager::ordered_songs()
     QCOMPARE(l_ordered_musiclist.at(3), "Announce The Truth (JFA).opus");
 }
 
-void tst_ConfigManager::regression_pr_314()
+void test_ConfigManager::regression_pr_314()
 {
     // Populate songlist.
     Q_UNUSED(ConfigManager::musiclist());
@@ -237,7 +239,7 @@ void tst_ConfigManager::regression_pr_314()
     QCOMPARE(l_list, ConfigManager::ordered_songs());
 }
 
-void tst_ConfigManager::CommandInfo()
+void test_ConfigManager::CommandInfo()
 {
     // Prepare command help cache.
     ConfigManager::loadCommandHelp();
@@ -253,208 +255,157 @@ void tst_ConfigManager::CommandInfo()
     QCOMPARE(l_help.usage, "/login");
 }
 
-void tst_ConfigManager::iprangeBans()
+void test_ConfigManager::iprangeBans()
 {
     QStringList l_ipranges = ConfigManager::iprangeBans();
     QCOMPARE(l_ipranges.at(0), "192.0.2.0/24");
     QCOMPARE(l_ipranges.at(1), "198.51.100.0/24");
 }
 
-void tst_ConfigManager::maxPlayers()
-{
-}
+void test_ConfigManager::maxPlayers()
+{}
 
-void tst_ConfigManager::serverPort()
-{
-}
+void test_ConfigManager::serverPort()
+{}
 
-void tst_ConfigManager::serverDescription()
-{
-}
+void test_ConfigManager::serverDescription()
+{}
 
-void tst_ConfigManager::serverName()
-{
-}
+void test_ConfigManager::serverName()
+{}
 
-void tst_ConfigManager::motd()
-{
-}
+void test_ConfigManager::motd()
+{}
 
-void tst_ConfigManager::webaoEnabled()
-{
-}
+void test_ConfigManager::webaoEnabled()
+{}
 
-void tst_ConfigManager::webaoPort()
-{
-}
+void test_ConfigManager::webaoPort()
+{}
 
-void tst_ConfigManager::authType()
-{
-}
+void test_ConfigManager::authType()
+{}
 
-void tst_ConfigManager::modpass()
-{
-}
+void test_ConfigManager::modpass()
+{}
 
-void tst_ConfigManager::logBuffer()
-{
-}
+void test_ConfigManager::logBuffer()
+{}
 
-void tst_ConfigManager::loggingType()
-{
-}
+void test_ConfigManager::loggingType()
+{}
 
-void tst_ConfigManager::maxStatements()
-{
-}
+void test_ConfigManager::maxStatements()
+{}
 
-void tst_ConfigManager::multiClientLimit()
-{
-}
+void test_ConfigManager::multiClientLimit()
+{}
 
-void tst_ConfigManager::maxCharacters()
-{
-}
+void test_ConfigManager::maxCharacters()
+{}
 
-void tst_ConfigManager::messageFloodguard()
-{
-}
+void test_ConfigManager::messageFloodguard()
+{}
 
-void tst_ConfigManager::globalMessageFloodguard()
-{
-}
+void test_ConfigManager::globalMessageFloodguard()
+{}
 
-void tst_ConfigManager::assetUrl()
-{
-}
+void test_ConfigManager::assetUrl()
+{}
 
-void tst_ConfigManager::diceMaxValue()
-{
-}
+void test_ConfigManager::diceMaxValue()
+{}
 
-void tst_ConfigManager::diceMaxDice()
-{
-}
+void test_ConfigManager::diceMaxDice()
+{}
 
-void tst_ConfigManager::discordWebhookEnabled()
-{
-}
+void test_ConfigManager::discordWebhookEnabled()
+{}
 
-void tst_ConfigManager::discordModcallWebhookEnabled()
-{
-}
+void test_ConfigManager::discordModcallWebhookEnabled()
+{}
 
-void tst_ConfigManager::discordModcallWebhookUrl()
-{
-}
+void test_ConfigManager::discordModcallWebhookUrl()
+{}
 
-void tst_ConfigManager::discordModcallWebhookContent()
-{
-}
+void test_ConfigManager::discordModcallWebhookContent()
+{}
 
-void tst_ConfigManager::discordModcallWebhookSendFile()
-{
-}
+void test_ConfigManager::discordModcallWebhookSendFile()
+{}
 
-void tst_ConfigManager::discordBanWebhookEnabled()
-{
-}
+void test_ConfigManager::discordBanWebhookEnabled()
+{}
 
-void tst_ConfigManager::discordBanWebhookUrl()
-{
-}
+void test_ConfigManager::discordBanWebhookUrl()
+{}
 
-void tst_ConfigManager::discordUptimeEnabled()
-{
-}
+void test_ConfigManager::discordUptimeEnabled()
+{}
 
-void tst_ConfigManager::discordUptimeTime()
-{
-}
+void test_ConfigManager::discordUptimeTime()
+{}
 
-void tst_ConfigManager::discordUptimeWebhookUrl()
-{
-}
+void test_ConfigManager::discordUptimeWebhookUrl()
+{}
 
-void tst_ConfigManager::discordWebhookColor()
-{
-}
+void test_ConfigManager::discordWebhookColor()
+{}
 
-void tst_ConfigManager::passwordRequirements()
-{
-}
+void test_ConfigManager::passwordRequirements()
+{}
 
-void tst_ConfigManager::passwordMinLength()
-{
-}
+void test_ConfigManager::passwordMinLength()
+{}
 
-void tst_ConfigManager::passwordMaxLength()
-{
-}
+void test_ConfigManager::passwordMaxLength()
+{}
 
-void tst_ConfigManager::passwordRequireMixCase()
-{
-}
+void test_ConfigManager::passwordRequireMixCase()
+{}
 
-void tst_ConfigManager::passwordRequireNumbers()
-{
-}
+void test_ConfigManager::passwordRequireNumbers()
+{}
 
-void tst_ConfigManager::passwordRequireSpecialCharacters()
-{
-}
+void test_ConfigManager::passwordRequireSpecialCharacters()
+{}
 
-void tst_ConfigManager::passwordCanContainUsername()
-{
-}
+void test_ConfigManager::passwordCanContainUsername()
+{}
 
-void tst_ConfigManager::afkTimeout()
-{
-}
+void test_ConfigManager::afkTimeout()
+{}
 
-void tst_ConfigManager::magic8BallAnswers()
-{
-}
+void test_ConfigManager::magic8BallAnswers()
+{}
 
-void tst_ConfigManager::praiseList()
-{
-}
+void test_ConfigManager::praiseList()
+{}
 
-void tst_ConfigManager::reprimandsList()
-{
-}
+void test_ConfigManager::reprimandsList()
+{}
 
-void tst_ConfigManager::gimpList()
-{
-}
+void test_ConfigManager::gimpList()
+{}
 
-void tst_ConfigManager::cdnList()
-{
-}
+void test_ConfigManager::cdnList()
+{}
 
-void tst_ConfigManager::advertiseServer()
-{
-}
+void test_ConfigManager::advertiseServer()
+{}
 
-void tst_ConfigManager::advertiserDebug()
-{
-}
+void test_ConfigManager::advertiserDebug()
+{}
 
-void tst_ConfigManager::advertiserIP()
-{
-}
+void test_ConfigManager::advertiserIP()
+{}
 
-void tst_ConfigManager::advertiserHostname()
-{
-}
+void test_ConfigManager::advertiserHostname()
+{}
 
-void tst_ConfigManager::advertiserCloudflareMode()
-{
-}
+void test_ConfigManager::advertiserCloudflareMode()
+{}
 
-}
-}
+QTEST_APPLESS_MAIN(test_ConfigManager)
 
-QTEST_APPLESS_MAIN(tests::unittests::tst_ConfigManager)
-
-#include "tst_unittest_config_manager.moc"
+#include "test_config_manager.moc"

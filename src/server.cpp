@@ -30,16 +30,13 @@
 #include "network/network_socket.h"
 #include "packet/packet_factory.h"
 
-Server::Server(int p_port, int p_ws_port, QObject *parent) :
+#include <QRegularExpression>
+
+Server::Server(int p_port, QObject *parent) :
     QObject(parent),
     port(p_port),
-    ws_port(p_ws_port),
     m_player_count(0)
 {
-    server = new QTcpServer(this);
-
-    connect(server, &QTcpServer::newConnection, this, &Server::clientConnected);
-
     timer = new QTimer(this);
 
     db_manager = new DBManager;
@@ -71,24 +68,15 @@ void Server::start()
     if (bind_addr.protocol() != QAbstractSocket::IPv4Protocol && bind_addr.protocol() != QAbstractSocket::IPv6Protocol && bind_addr != QHostAddress::Any) {
         qDebug() << bind_ip << "is an invalid IP address to listen on! Server not starting, check your config.";
     }
-    if (!server->listen(bind_addr, port)) {
-        qDebug() << "Server error:" << server->errorString();
+
+    m_listener = new QWebSocketServer("Akashi", QWebSocketServer::NonSecureMode, this);
+    connect(m_listener, &QWebSocketServer::newConnection,
+            this, &Server::clientConnected);
+    if (m_listener->listen(bind_addr, port)) {
+        qInfo() << "Websocket Server listening on" << m_listener->serverPort();
     }
     else {
-        qDebug() << "Server listening on" << port;
-    }
-
-    // Enable WebAO
-    if (ConfigManager::webaoEnabled()) {
-        ws_server = new QWebSocketServer("Akashi", QWebSocketServer::NonSecureMode, this);
-        if (!ws_server->listen(bind_addr, ConfigManager::webaoPort())) {
-            qDebug() << "Websocket Server error:" << ws_server->errorString();
-        }
-        else {
-            connect(ws_server, &QWebSocketServer::newConnection,
-                    this, &Server::ws_clientConnected);
-            qInfo() << "Websocket Server listening on" << ConfigManager::webaoPort();
-        }
+        qDebug() << "Websocket Server error:" << m_listener->errorString();
     }
 
     // Checks if any Discord webhooks are enabled.
@@ -102,7 +90,7 @@ void Server::start()
         connect(AdvertiserTimer, &QTimer::timeout, ms3_Advertiser, &Advertiser::msAdvertiseServer);
         connect(this, &Server::playerCountUpdated, ms3_Advertiser, &Advertiser::updatePlayerCount);
         connect(this, &Server::updateHTTPConfiguration, ms3_Advertiser, &Advertiser::updateAdvertiserSettings);
-        emit playerCountUpdated(m_player_count);
+        Q_EMIT playerCountUpdated(m_player_count);
         ms3_Advertiser->msAdvertiseServer();
         AdvertiserTimer->start(300000);
     }
@@ -161,98 +149,7 @@ QVector<AOClient *> Server::getClients()
 
 void Server::clientConnected()
 {
-    QTcpSocket *socket = server->nextPendingConnection();
-
-    // Too many players. Reject connection!
-    // This also enforces the maximum playercount.
-    if (m_available_ids.empty()) {
-        AOPacket *disconnect_reason = PacketFactory::createPacket("BD", {"Maximum playercount has been reached."});
-        socket->write(disconnect_reason->toUtf8());
-        socket->flush();
-        socket->close();
-        socket->deleteLater();
-        return;
-    }
-
-    int user_id = m_available_ids.pop();
-    // The parent hierachry looks like this :
-    // QTcpSocket -> NetworkSocket -> AOClient
-    NetworkSocket *l_socket = new NetworkSocket(socket, socket);
-    AOClient *client = new AOClient(this, l_socket, l_socket, user_id, music_manager);
-    m_clients_ids.insert(user_id, client);
-    m_player_state_observer.registerClient(client);
-
-    int multiclient_count = 1;
-    bool is_at_multiclient_limit = false;
-    client->calculateIpid();
-    auto ban = db_manager->isIPBanned(client->getIpid());
-    bool is_banned = ban.first;
-    for (AOClient *joined_client : qAsConst(m_clients)) {
-        if (client->m_remote_ip.isEqual(joined_client->m_remote_ip))
-            multiclient_count++;
-    }
-
-    if (multiclient_count > ConfigManager::multiClientLimit() && !client->m_remote_ip.isLoopback())
-        is_at_multiclient_limit = true;
-
-    if (is_banned) {
-        QString ban_duration;
-        if (!(ban.second.duration == -2)) {
-            ban_duration = QDateTime::fromSecsSinceEpoch(ban.second.time).addSecs(ban.second.duration).toString("MM/dd/yyyy, hh:mm");
-        }
-        else {
-            ban_duration = "The heat death of the universe.";
-        }
-        AOPacket *ban_reason = PacketFactory::createPacket("BD", {"Reason: " + ban.second.reason + "\nBan ID: " + QString::number(ban.second.id) + "\nUntil: " + ban_duration});
-        socket->write(ban_reason->toUtf8());
-    }
-    if (is_banned || is_at_multiclient_limit) {
-        socket->flush();
-        client->deleteLater();
-        socket->close();
-        markIDFree(user_id);
-        return;
-    }
-
-    QHostAddress l_remote_ip = client->m_remote_ip;
-    if (l_remote_ip.protocol() == QAbstractSocket::IPv6Protocol) {
-        l_remote_ip = parseToIPv4(l_remote_ip);
-    }
-
-    if (isIPBanned(l_remote_ip)) {
-        QString l_reason = "Your IP has been banned by a moderator.";
-        AOPacket *l_ban_reason = PacketFactory::createPacket("BD", {l_reason});
-        socket->write(l_ban_reason->toUtf8());
-        client->deleteLater();
-        socket->close();
-        markIDFree(user_id);
-        return;
-    }
-
-    m_clients.append(client);
-    connect(l_socket, &NetworkSocket::clientDisconnected, this, [=] {
-        if (client->hasJoined()) {
-            decreasePlayerCount();
-        }
-        m_clients.removeAll(client);
-        client->deleteLater();
-    });
-    connect(l_socket, &NetworkSocket::handlePacket, client, &AOClient::handlePacket);
-
-    // This is the infamous workaround for
-    // tsuserver4. It should disable fantacrypt
-    // completely in any client 2.4.3 or newer
-    AOPacket *decryptor = PacketFactory::createPacket("decryptor", {"NOENCRYPT"});
-    client->sendPacket(decryptor);
-    hookupAOClient(client);
-#ifdef NET_DEBUG
-    qDebug() << client->m_remote_ip.toString() << "connected";
-#endif
-}
-
-void Server::ws_clientConnected()
-{
-    QWebSocket *socket = ws_server->nextPendingConnection();
+    QWebSocket *socket = m_listener->nextPendingConnection();
     NetworkSocket *l_socket = new NetworkSocket(socket, socket);
 
     // Too many players. Reject connection!
@@ -395,8 +292,8 @@ QHostAddress Server::parseToIPv4(QHostAddress f_remote_ip)
 void Server::reloadSettings()
 {
     ConfigManager::reloadSettings();
-    emit reloadRequest(ConfigManager::serverName(), ConfigManager::serverDescription());
-    emit updateHTTPConfiguration();
+    Q_EMIT reloadRequest(ConfigManager::serverName(), ConfigManager::serverDescription());
+    Q_EMIT updateHTTPConfiguration();
     handleDiscordIntegration();
     logger->loadLogtext();
     m_ipban_list = ConfigManager::iprangeBans();
@@ -519,11 +416,13 @@ QString Server::getCharacterById(int f_chr_id)
 
 int Server::getCharID(QString char_name)
 {
-    for (const QString &character : qAsConst(m_characters)) {
-        if (character.toLower() == char_name.toLower()) {
-            return m_characters.indexOf(QRegExp(character, Qt::CaseInsensitive, QRegExp::FixedString));
+    char_name = char_name.toLower();
+    for (int i = 0; i < m_characters.length(); i++) {
+        if (m_characters.at(i).toLower() == char_name) {
+            return i;
         }
     }
+
     return -1; // character does not exist
 }
 
@@ -642,13 +541,13 @@ void Server::hookupAOClient(AOClient *client)
 void Server::increasePlayerCount()
 {
     m_player_count++;
-    emit playerCountUpdated(m_player_count);
+    Q_EMIT playerCountUpdated(m_player_count);
 }
 
 void Server::decreasePlayerCount()
 {
     m_player_count--;
-    emit playerCountUpdated(m_player_count);
+    Q_EMIT playerCountUpdated(m_player_count);
 }
 
 bool Server::isIPBanned(QHostAddress f_remote_IP)
@@ -668,7 +567,7 @@ Server::~Server()
     for (AOClient *l_client : qAsConst(m_clients)) {
         l_client->deleteLater();
     }
-    server->deleteLater();
+    m_listener->deleteLater();
     discord->deleteLater();
     acl_roles_handler->deleteLater();
 

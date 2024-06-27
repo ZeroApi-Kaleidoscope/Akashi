@@ -147,7 +147,7 @@ class MusicManager : public QObject
      */
     bool isCustom(int f_area_id, QString f_song_name);
 
-  public slots:
+  public Q_SLOTS:
 
     /**
      * @brief Updates the root musiclist and CDN list.
@@ -159,7 +159,7 @@ class MusicManager : public QObject
      */
     void userJoinedArea(int f_area_index, int f_user_id);
 
-  signals:
+  Q_SIGNALS:
 
     /**
      * @brief Sends the FM packet with the musiclist of the area when a client enters.

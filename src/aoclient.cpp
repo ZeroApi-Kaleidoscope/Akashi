@@ -151,7 +151,7 @@ const QMap<QString, AOClient::CommandInfo> AOClient::COMMANDS{
 
 void AOClient::clientDisconnected()
 {
-#ifdef NET_DEBUG
+#ifdef KAL_AKASHI_DEBUG_NETWORK
     qDebug() << m_remote_ip.toString() << "disconnected";
 #endif
     if (m_joined) {
@@ -174,12 +174,12 @@ void AOClient::clientDisconnected()
     if (l_updateLocks)
         arup(ARUPType::LOCKED, true);
     arup(ARUPType::CM, true);
-    emit clientSuccessfullyDisconnected(clientId());
+    Q_EMIT clientSuccessfullyDisconnected(clientId());
 }
 
 void AOClient::handlePacket(AOPacket *packet)
 {
-#ifdef NET_DEBUG
+#ifdef KAL_AKASHI_DEBUG_NETWORK
     qDebug() << "Received packet:" << packet->getPacketInfo().header << ":" << packet->getContent() << "args length:" << packet->getContent().length();
 #endif
     AreaData *l_area = server->getAreaById(areaId());
@@ -200,7 +200,7 @@ void AOClient::handlePacket(AOPacket *packet)
     }
 
     if (packet->getContent().length() < packet->getPacketInfo().min_args) {
-#ifdef NET_DEBUG
+#ifdef KAL_AKASHI_DEBUG_NETWORK
         qDebug() << "Invalid packet args length. Minimum is" << packet->getPacketInfo().min_args << "but only" << packet->getContent().length() << "were given.";
 #endif
         return;

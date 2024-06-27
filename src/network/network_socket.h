@@ -20,35 +20,16 @@
 
 #include <QHostAddress>
 #include <QObject>
-#include <QTcpSocket>
 #include <QWebSocket>
 
 #include "network/aopacket.h"
-
-class AOPacket;
 
 class NetworkSocket : public QObject
 {
     Q_OBJECT
 
   public:
-    /**
-     * @brief Constructor for the network socket class.
-     * @param QTcpSocket for communication with external AO2-Client
-     * @param Pointer to the server object.
-     */
-    NetworkSocket(QTcpSocket *f_socket, QObject *parent = nullptr);
-
-    /**
-     * @brief Constructor for the network socket class.
-     * @param QWebSocket for communication with external AO2-Client or WebAO clients.
-     * @param Pointer to the server object.
-     */
     NetworkSocket(QWebSocket *f_socket, QObject *parent = nullptr);
-
-    /**
-     * @brief Default destructor for the NetworkSocket object.
-     */
     ~NetworkSocket();
 
     /**
@@ -77,7 +58,7 @@ class NetworkSocket : public QObject
      */
     void write(AOPacket *f_packet);
 
-  signals:
+  Q_SIGNALS:
 
     /**
      * @brief handlePacket
@@ -90,35 +71,16 @@ class NetworkSocket : public QObject
      */
     void clientDisconnected();
 
-  private slots:
-    /**
-     * @brief Handles the reading and processing of TCP stream data.
-     *
-     * @return Decoded AOPacket to be processed by the child AOClient object.
-     */
-    void readData();
-
+  private Q_SLOTS:
     /**
      * @brief Handles the processing of WebSocket data.
      *
      * @return Decoded AOPacket to be processed by the child AOClient object.
      */
-    void ws_readData(QString f_data);
+    void handleTextMessage(QString f_data);
 
   private:
-    enum SocketType
-    {
-        TCP,
-        WS
-    };
-
-    /**
-     * @brief Union holding either a TCP- or Websocket.
-     */
-    union {
-        QTcpSocket *tcp;
-        QWebSocket *ws;
-    } m_client_socket;
+    QWebSocket *m_client_socket;
 
     /**
      * @brief Remote IP of the client.
@@ -126,11 +88,6 @@ class NetworkSocket : public QObject
      * @details In the case of the WebSocket we also check if this has been proxy forwarded.
      */
     QHostAddress m_socket_ip;
-
-    /**
-     * @brief Defines if the client is a Websocket or TCP client.
-     */
-    SocketType m_socket_type;
 
     /**
      * @brief Filled with part of a packet if said packet could not be read fully from the client's socket.

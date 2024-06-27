@@ -1,80 +1,49 @@
-#include <QtTest>
-
 #include "area_data.h"
+#include "config_manager.h"
+
+#include <QtTest>
 
 Q_DECLARE_METATYPE(AreaData::Side);
 
-namespace tests {
-namespace unittests {
-
-/**
- * @brief Unit Tester class for the area-related functions.
- */
-class Area : public QObject
+class test_Area : public QObject
 {
     Q_OBJECT
 
-  public:
-    /**
-     * @brief An AreaData pointer to test with.
-     */
+  private:
     AreaData *m_area;
 
-  private slots:
-    /**
-     * @brief Initialises every tests with creating a new area with the title "Test Area", and the index of 0.
-     */
+  private Q_SLOTS:
+
     void init();
 
-    /**
-     * @brief Cleans up the area pointer.
-     */
     void cleanup();
 
-    /**
-     * @test Tests various scenarios of a client joining and leaving, and what it changes on the area.
-     */
     void clientJoinLeave();
 
-    /**
-     * @brief The data function for areaStatuses().
-     */
     void areaStatuses_data();
 
-    /**
-     * @test Tests various attempts at changing area statuses.
-     */
     void areaStatuses();
 
-    /**
-     * @brief The data function for changeHP().
-     */
     void changeHP_data();
 
-    /**
-     * @test Tests changing Confidence bar values for the sides.
-     */
     void changeHP();
 
-    /**
-     * @test Tests changing character in the area.
-     */
     void changeCharacter();
 
     void testimony();
 };
 
-void Area::init()
+void test_Area::init()
 {
     m_area = new AreaData("Test Area", 0, nullptr);
 }
 
-void Area::cleanup()
+void test_Area::cleanup()
 {
-    delete m_area;
+    m_area->deleteLater();
 }
 
-void Area::clientJoinLeave()
+void test_Area::clientJoinLeave()
 {
     {
         // There must be exactly one client in the area, and it must have a charid of 5 and userid 0.
@@ -91,7 +60,7 @@ void Area::clientJoinLeave()
     }
 }
 
-void Area::areaStatuses_data()
+void test_Area::areaStatuses_data()
 {
     QTest::addColumn<QString>("statusCall");
     QTest::addColumn<AreaData::Status>("expectedStatus");
@@ -107,7 +76,7 @@ void Area::areaStatuses_data()
     QTest::newRow("Nonsense") << "blah" << AreaData::Status::IDLE << false;
 }
 
-void Area::areaStatuses()
+void test_Area::areaStatuses()
 {
     QFETCH(QString, statusCall);
     QFETCH(AreaData::Status, expectedStatus);
@@ -119,7 +88,7 @@ void Area::areaStatuses()
     QCOMPARE(l_success, isSuccessful);
 }
 
-void Area::changeHP_data()
+void test_Area::changeHP_data()
 {
     QTest::addColumn<AreaData::Side>("side");
     QTest::addColumn<int>("setHP");
@@ -133,7 +102,7 @@ void Area::changeHP_data()
     QTest::newRow("Above Ten (PRO)") << AreaData::Side::PROSECUTOR << 14 << 10;
 }
 
-void Area::changeHP()
+void test_Area::changeHP()
 {
     QFETCH(AreaData::Side, side);
     QFETCH(int, setHP);
@@ -149,7 +118,7 @@ void Area::changeHP()
     }
 }
 
-void Area::changeCharacter()
+void test_Area::changeCharacter()
 {
     {
         // A client with a charid of 6 and userid 0 joins. There's only them in there.
@@ -200,7 +169,7 @@ void Area::changeCharacter()
     }
 }
 
-void Area::testimony()
+void test_Area::testimony()
 {
     QVector<QStringList> l_testimony = {
         {"A"},
@@ -245,9 +214,6 @@ void Area::testimony()
     }
 }
 
-}
-}
+QTEST_APPLESS_MAIN(test_Area)
 
-QTEST_APPLESS_MAIN(tests::unittests::Area)
-
-#include "tst_unittest_area.moc"
+#include "test_area.moc"
