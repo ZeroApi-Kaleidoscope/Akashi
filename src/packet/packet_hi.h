@@ -5,12 +5,12 @@
 
 class PacketHI : public AOPacket
 {
-  public:
-    PacketHI(QStringList &contents);
-    virtual PacketInfo getPacketInfo() const;
-    virtual void handlePacket(AreaData *area, AOClient &client) const;
+public:
+  PacketHI(QStringList &contents);
+  virtual PacketInfo getPacketInfo() const;
+  virtual void handlePacket(AreaData *area, AOClient &client) const;
 
-  private:
-    QString header;
+private:
+  QString header;
 };
 #endif

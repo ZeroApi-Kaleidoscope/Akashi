@@ -5,9 +5,9 @@
 
 class PacketRT : public AOPacket
 {
-  public:
-    PacketRT(QStringList &contents);
-    virtual PacketInfo getPacketInfo() const;
-    virtual void handlePacket(AreaData *area, AOClient &client) const;
+public:
+  PacketRT(QStringList &contents);
+  virtual PacketInfo getPacketInfo() const;
+  virtual void handlePacket(AreaData *area, AOClient &client) const;
 };
 #endif

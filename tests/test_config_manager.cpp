@@ -5,136 +5,136 @@
 
 class test_ConfigManager : public QObject
 {
-    Q_OBJECT
+  Q_OBJECT
 
-    typedef QMap<QString, QPair<QString, int>> MusicList;
+  typedef QMap<QString, QPair<QString, int>> MusicList;
 
-  private:
-    ConfigManager *m_config = nullptr;
+private:
+  ConfigManager *m_config = nullptr;
 
-  private Q_SLOTS:
-    void init() { m_config = new ConfigManager; }
+private Q_SLOTS:
+  void init() { m_config = new ConfigManager; }
 
-    void cleanup() { delete m_config; }
+  void cleanup() { delete m_config; }
 
-    void verifyServerConfig();
+  void verifyServerConfig();
 
-    void bindIP();
+  void bindIP();
 
-    void charlist();
+  void charlist();
 
-    void backgrounds();
+  void backgrounds();
 
-    void musiclist();
+  void musiclist();
 
-    void ordered_songs();
+  void ordered_songs();
 
-    /**
-     * @brief Tests the loading routine for the musiclist.
-     *
-     * @details Handles regression testing for a bug fixed in PR#314 in which a
-     * musiclist would be loaded twice and the old root instance was not cleared,
-     * causing each reload to append the musiclist to the old list.
-     */
-    void regression_pr_314();
+  /**
+   * @brief Tests the loading routine for the musiclist.
+   *
+   * @details Handles regression testing for a bug fixed in PR#314 in which a
+   * musiclist would be loaded twice and the old root instance was not cleared,
+   * causing each reload to append the musiclist to the old list.
+   */
+  void regression_pr_314();
 
-    void CommandInfo();
+  void CommandInfo();
 
-    void iprangeBans();
+  void iprangeBans();
 
-    void maxPlayers();
+  void maxPlayers();
 
-    void serverPort();
+  void serverPort();
 
-    void serverDescription();
+  void serverDescription();
 
-    void serverName();
+  void serverName();
 
-    void motd();
+  void motd();
 
-    void webaoEnabled();
+  void webaoEnabled();
 
-    void authType();
+  void authType();
 
-    void modpass();
+  void modpass();
 
-    void logBuffer();
+  void logBuffer();
 
-    void loggingType();
+  void loggingType();
 
-    void maxStatements();
+  void maxStatements();
 
-    void multiClientLimit();
+  void multiClientLimit();
 
-    void maxCharacters();
+  void maxCharacters();
 
-    void messageFloodguard();
+  void messageFloodguard();
 
-    void globalMessageFloodguard();
+  void globalMessageFloodguard();
 
-    void assetUrl();
+  void assetUrl();
 
-    void diceMaxValue();
+  void diceMaxValue();
 
-    void diceMaxDice();
+  void diceMaxDice();
 
-    void discordWebhookEnabled();
+  void discordWebhookEnabled();
 
-    void discordModcallWebhookEnabled();
+  void discordModcallWebhookEnabled();
 
-    void discordModcallWebhookUrl();
+  void discordModcallWebhookUrl();
 
-    void discordModcallWebhookContent();
+  void discordModcallWebhookContent();
 
-    void discordModcallWebhookSendFile();
+  void discordModcallWebhookSendFile();
 
-    void discordBanWebhookEnabled();
+  void discordBanWebhookEnabled();
 
-    void discordBanWebhookUrl();
+  void discordBanWebhookUrl();
 
-    void discordUptimeEnabled();
+  void discordUptimeEnabled();
 
-    void discordUptimeTime();
+  void discordUptimeTime();
 
-    void discordUptimeWebhookUrl();
+  void discordUptimeWebhookUrl();
 
-    void discordWebhookColor();
+  void discordWebhookColor();
 
-    void passwordRequirements();
+  void passwordRequirements();
 
-    void passwordMinLength();
+  void passwordMinLength();
 
-    void passwordMaxLength();
+  void passwordMaxLength();
 
-    void passwordRequireMixCase();
+  void passwordRequireMixCase();
 
-    void passwordRequireNumbers();
+  void passwordRequireNumbers();
 
-    void passwordRequireSpecialCharacters();
+  void passwordRequireSpecialCharacters();
 
-    void passwordCanContainUsername();
+  void passwordCanContainUsername();
 
-    void afkTimeout();
+  void afkTimeout();
 
-    void magic8BallAnswers();
+  void magic8BallAnswers();
 
-    void praiseList();
+  void praiseList();
 
-    void reprimandsList();
+  void reprimandsList();
 
-    void gimpList();
+  void gimpList();
 
-    void cdnList();
+  void cdnList();
 
-    void advertiseServer();
+  void advertiseServer();
 
-    void advertiserDebug();
+  void advertiserDebug();
 
-    void advertiserIP();
+  void advertiserIP();
 
-    void advertiserHostname();
+  void advertiserHostname();
 
-    void advertiserCloudflareMode();
+  void advertiserCloudflareMode();
 };
 
 /**
@@ -142,23 +142,25 @@ class test_ConfigManager : public QObject
  */
 void test_ConfigManager::verifyServerConfig()
 {
-    // If the sample folder is not renamed or a file is missing, we fail the test.
-    QCOMPARE(ConfigManager::verifyServerConfig(), true);
+  // If the sample folder is not renamed or a file is missing, we fail the test.
+  QCOMPARE(ConfigManager::verifyServerConfig(), true);
 
-    // We remove a config file and test again. This should now fail as cdns.txt is missing.
-    QCOMPARE(QFile("config/text/cdns.txt").remove(), true);
-    QCOMPARE(ConfigManager::verifyServerConfig(), false);
+  // We remove a config file and test again. This should now fail as cdns.txt is missing.
+  QCOMPARE(QFile("config/text/cdns.txt").remove(), true);
+  QCOMPARE(ConfigManager::verifyServerConfig(), false);
 
-    // We rebuild the file.
-    QFile cdns_config("config/text/cdns.txt");
-    if (cdns_config.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
-        QTextStream write_stream(&cdns_config);
-        write_stream << "cdn.discord.com";
-        cdns_config.close();
-    }
-    else {
-        qDebug() << "Unable to recreate cdns config file.";
-    }
+  // We rebuild the file.
+  QFile cdns_config("config/text/cdns.txt");
+  if (cdns_config.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
+  {
+    QTextStream write_stream(&cdns_config);
+    write_stream << "cdn.discord.com";
+    cdns_config.close();
+  }
+  else
+  {
+    qDebug() << "Unable to recreate cdns config file.";
+  }
 }
 
 /**
@@ -166,98 +168,98 @@ void test_ConfigManager::verifyServerConfig()
  */
 void test_ConfigManager::bindIP()
 {
-    QCOMPARE(ConfigManager::bindIP(), "all");
+  QCOMPARE(ConfigManager::bindIP(), "all");
 }
 
 void test_ConfigManager::charlist()
 {
-    // We check that the list is unsorted and exactly as defined in the text file.
-    QStringList l_characters = ConfigManager::charlist();
-    QCOMPARE(l_characters.at(0), "Zak");
-    QCOMPARE(l_characters.at(1), "Adrian");
-    QCOMPARE(l_characters.at(2), "Armstrong");
-    QCOMPARE(l_characters.at(3), "Butz");
-    QCOMPARE(l_characters.at(4), "Diego");
+  // We check that the list is unsorted and exactly as defined in the text file.
+  QStringList l_characters = ConfigManager::charlist();
+  QCOMPARE(l_characters.at(0), "Zak");
+  QCOMPARE(l_characters.at(1), "Adrian");
+  QCOMPARE(l_characters.at(2), "Armstrong");
+  QCOMPARE(l_characters.at(3), "Butz");
+  QCOMPARE(l_characters.at(4), "Diego");
 }
 
 void test_ConfigManager::backgrounds()
 {
-    // We check that the list is unsorted and exactly as defined in the text file.
-    QStringList l_backgrounds = ConfigManager::backgrounds();
+  // We check that the list is unsorted and exactly as defined in the text file.
+  QStringList l_backgrounds = ConfigManager::backgrounds();
 
-    QCOMPARE(l_backgrounds.at(0), "Anime");
-    QCOMPARE(l_backgrounds.at(1), "Zetta");
-    QCOMPARE(l_backgrounds.at(2), "default");
-    QCOMPARE(l_backgrounds.at(3), "birthday");
-    QCOMPARE(l_backgrounds.at(4), "Christmas");
+  QCOMPARE(l_backgrounds.at(0), "Anime");
+  QCOMPARE(l_backgrounds.at(1), "Zetta");
+  QCOMPARE(l_backgrounds.at(2), "default");
+  QCOMPARE(l_backgrounds.at(3), "birthday");
+  QCOMPARE(l_backgrounds.at(4), "Christmas");
 }
 
 void test_ConfigManager::musiclist()
 {
-    MusicList l_musiclist = ConfigManager::musiclist();
-    qDebug() << l_musiclist;
-    QPair<QString, int> l_contents;
-    // The musiclist is structured as {DisplayName , {Songname, Duration}}.
+  MusicList l_musiclist = ConfigManager::musiclist();
+  qDebug() << l_musiclist;
+  QPair<QString, int> l_contents;
+  // The musiclist is structured as {DisplayName , {Songname, Duration}}.
 
-    // Categories have no duration and their alias is always the category name.
-    l_contents = l_musiclist.value("==Samplelist==");
-    QCOMPARE(l_contents.first, "==Samplelist==");
-    QCOMPARE(l_contents.second, 0);
+  // Categories have no duration and their alias is always the category name.
+  l_contents = l_musiclist.value("==Samplelist==");
+  QCOMPARE(l_contents.first, "==Samplelist==");
+  QCOMPARE(l_contents.second, 0);
 
-    // The displayname is shown in the musiclist. The realname is what is send to the client when it wants to play the song.
-    l_contents = l_musiclist.value("Announce The Truth (JFA).opus");
-    QCOMPARE(l_contents.first, "https://localhost/Announce The Truth (JFA).opus");
-    QCOMPARE(l_contents.second, 98);
+  // The displayname is shown in the musiclist. The realname is what is send to the client when it wants to play the song.
+  l_contents = l_musiclist.value("Announce The Truth (JFA).opus");
+  QCOMPARE(l_contents.first, "https://localhost/Announce The Truth (JFA).opus");
+  QCOMPARE(l_contents.second, 98);
 }
 
 void test_ConfigManager::ordered_songs()
 {
-    QStringList l_ordered_musiclist = ConfigManager::ordered_songs();
-    QCOMPARE(l_ordered_musiclist.at(0), "==Samplelist==");
-    QCOMPARE(l_ordered_musiclist.at(1), "Announce The Truth (AA).opus");
-    QCOMPARE(l_ordered_musiclist.at(2), "Announce The Truth (AJ).opus");
-    QCOMPARE(l_ordered_musiclist.at(3), "Announce The Truth (JFA).opus");
+  QStringList l_ordered_musiclist = ConfigManager::ordered_songs();
+  QCOMPARE(l_ordered_musiclist.at(0), "==Samplelist==");
+  QCOMPARE(l_ordered_musiclist.at(1), "Announce The Truth (AA).opus");
+  QCOMPARE(l_ordered_musiclist.at(2), "Announce The Truth (AJ).opus");
+  QCOMPARE(l_ordered_musiclist.at(3), "Announce The Truth (JFA).opus");
 }
 
 void test_ConfigManager::regression_pr_314()
 {
-    // Populate songlist.
-    Q_UNUSED(ConfigManager::musiclist());
+  // Populate songlist.
+  Q_UNUSED(ConfigManager::musiclist());
 
-    // Tests for regression where a reload of the songlist would cause the list to duplicate.
-    QStringList l_list = ConfigManager::ordered_songs();
+  // Tests for regression where a reload of the songlist would cause the list to duplicate.
+  QStringList l_list = ConfigManager::ordered_songs();
 
-    // We have a populated ordered list and it has a valid size.
-    QCOMPARE(l_list.isEmpty(), false);
-    QCOMPARE(l_list.size(), 4);
+  // We have a populated ordered list and it has a valid size.
+  QCOMPARE(l_list.isEmpty(), false);
+  QCOMPARE(l_list.size(), 4);
 
-    // We are reloading the songlist. The size should be the same and the list has not changed.
-    Q_UNUSED(ConfigManager::musiclist());
-    QCOMPARE(l_list.size(), ConfigManager::ordered_songs().size());
-    QCOMPARE(l_list, ConfigManager::ordered_songs());
+  // We are reloading the songlist. The size should be the same and the list has not changed.
+  Q_UNUSED(ConfigManager::musiclist());
+  QCOMPARE(l_list.size(), ConfigManager::ordered_songs().size());
+  QCOMPARE(l_list, ConfigManager::ordered_songs());
 }
 
 void test_ConfigManager::CommandInfo()
 {
-    // Prepare command help cache.
-    ConfigManager::loadCommandHelp();
-    ConfigManager::help l_help;
+  // Prepare command help cache.
+  ConfigManager::loadCommandHelp();
+  ConfigManager::help l_help;
 
-    // Load the sample command information.
-    l_help = ConfigManager::commandHelp("foo");
-    QCOMPARE(l_help.text, "A sample explanation.");
-    QCOMPARE(l_help.usage, "/foo <bar> [baz|qux]");
+  // Load the sample command information.
+  l_help = ConfigManager::commandHelp("foo");
+  QCOMPARE(l_help.text, "A sample explanation.");
+  QCOMPARE(l_help.usage, "/foo <bar> [baz|qux]");
 
-    l_help = ConfigManager::commandHelp("login");
-    QCOMPARE(l_help.text, "Activates the login dialogue to enter your credentials. This command takes no arguments.");
-    QCOMPARE(l_help.usage, "/login");
+  l_help = ConfigManager::commandHelp("login");
+  QCOMPARE(l_help.text, "Activates the login dialogue to enter your credentials. This command takes no arguments.");
+  QCOMPARE(l_help.usage, "/login");
 }
 
 void test_ConfigManager::iprangeBans()
 {
-    QStringList l_ipranges = ConfigManager::iprangeBans();
-    QCOMPARE(l_ipranges.at(0), "192.0.2.0/24");
-    QCOMPARE(l_ipranges.at(1), "198.51.100.0/24");
+  QStringList l_ipranges = ConfigManager::iprangeBans();
+  QCOMPARE(l_ipranges.at(0), "192.0.2.0/24");
+  QCOMPARE(l_ipranges.at(1), "198.51.100.0/24");
 }
 
 void test_ConfigManager::maxPlayers()
@@ -276,9 +278,6 @@ void test_ConfigManager::motd()
 {}
 
 void test_ConfigManager::webaoEnabled()
-{}
-
-void test_ConfigManager::webaoPort()
 {}
 
 void test_ConfigManager::authType()

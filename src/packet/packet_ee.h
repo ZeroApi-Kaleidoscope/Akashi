@@ -5,9 +5,9 @@
 
 class PacketEE : public AOPacket
 {
-  public:
-    PacketEE(QStringList &contents);
-    virtual PacketInfo getPacketInfo() const;
-    virtual void handlePacket(AreaData *area, AOClient &client) const;
+public:
+  PacketEE(QStringList &contents);
+  virtual PacketInfo getPacketInfo() const;
+  virtual void handlePacket(AreaData *area, AOClient &client) const;
 };
 #endif
