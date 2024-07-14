@@ -6,9 +6,9 @@
 /// Describes a packet's interpretation details.
 class PacketInfo
 {
-  public:
-    ACLRole::Permission acl_permission; //!< The permissions necessary for the packet.
-    int min_args;                       //!< The minimum arguments needed for the packet to be interpreted correctly / make sense.
-    QString header;
+public:
+  ACLRole::Permission acl_permission; //!< The permissions necessary for the packet.
+  int min_args;                       //!< The minimum arguments needed for the packet to be interpreted correctly / make sense.
+  QString header;
 };
 #endif

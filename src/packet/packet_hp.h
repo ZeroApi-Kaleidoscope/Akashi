@@ -5,9 +5,9 @@
 
 class PacketHP : public AOPacket
 {
-  public:
-    PacketHP(QStringList &contents);
-    virtual PacketInfo getPacketInfo() const;
-    virtual void handlePacket(AreaData *area, AOClient &client) const;
+public:
+  PacketHP(QStringList &contents);
+  virtual PacketInfo getPacketInfo() const;
+  virtual void handlePacket(AreaData *area, AOClient &client) const;
 };
 #endif
