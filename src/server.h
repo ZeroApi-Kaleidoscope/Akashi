@@ -42,7 +42,6 @@ class DBManager;
 class Discord;
 class MusicManager;
 class ULogger;
-class WSProxy;
 
 /**
  * @brief The class that represents the actual server as it is.
@@ -70,8 +69,7 @@ class Server : public QObject
     /**
      * @brief Starts the server.
      *
-     * @details Amongst other things, this function starts the listening on the given TCP port, sets up the server
-     * according to the configuration file, and starts listening on the WebSocket port if it is not `-1`.
+     * @details Starts listening for incoming connections on the given port.
      *
      * Advertising is not done here -- see Advertiser::contactMasterServer() for that.
      */
@@ -411,16 +409,9 @@ class Server : public QObject
 
   private:
     /**
-     * @brief The proxy used for WebSocket connections.
-     *
-     * @see WSProxy and WSClient for an explanation as to why this is a thing.
-     */
-    WSProxy *proxy;
-
-    /**
      * @brief Listens for incoming websocket connections.
      */
-    QWebSocketServer *m_listener;
+    QWebSocketServer *server;
 
     /**
      * @brief Handles Discord webhooks.
@@ -448,9 +439,9 @@ class Server : public QObject
     MusicManager *music_manager;
 
     /**
-     * @brief The port through which the server will accept TCP connections.
+     * @brief The port through which the server will accept WebSocket connections.
      */
-    int port;
+    int m_port;
 
     /**
      * @brief The collection of all currently connected clients.

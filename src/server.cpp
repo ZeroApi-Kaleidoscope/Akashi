@@ -69,14 +69,14 @@ void Server::start()
         qDebug() << bind_ip << "is an invalid IP address to listen on! Server not starting, check your config.";
     }
 
-    m_listener = new QWebSocketServer("Akashi", QWebSocketServer::NonSecureMode, this);
-    connect(m_listener, &QWebSocketServer::newConnection,
-            this, &Server::clientConnected);
-    if (m_listener->listen(bind_addr, port)) {
-        qInfo() << "Websocket Server listening on" << m_listener->serverPort();
+    server = new QWebSocketServer("Akashi", QWebSocketServer::NonSecureMode, this);
+    if (!server->listen(bind_addr, m_port)) {
+        qDebug() << "Server error:" << server->errorString();
     }
     else {
-        qDebug() << "Websocket Server error:" << m_listener->errorString();
+        connect(server, &QWebSocketServer::newConnection,
+                this, &Server::clientConnected);
+        qInfo() << "Server listening on" << server->serverPort();
     }
 
     // Checks if any Discord webhooks are enabled.
@@ -85,7 +85,7 @@ void Server::start()
     // Construct modern advertiser if enabled in config
     if (ConfigManager::advertiseServer()) {
         AdvertiserTimer = new QTimer(this);
-        ms3_Advertiser = new Advertiser();
+        ms3_Advertiser = new Advertiser(server->serverPort());
 
         connect(AdvertiserTimer, &QTimer::timeout, ms3_Advertiser, &Advertiser::msAdvertiseServer);
         connect(this, &Server::playerCountUpdated, ms3_Advertiser, &Advertiser::updatePlayerCount);
@@ -149,7 +149,7 @@ QVector<AOClient *> Server::getClients()
 
 void Server::clientConnected()
 {
-    QWebSocket *socket = m_listener->nextPendingConnection();
+    QWebSocket *socket = server->nextPendingConnection();
     NetworkSocket *l_socket = new NetworkSocket(socket, socket);
 
     // Too many players. Reject connection!
@@ -186,7 +186,7 @@ void Server::clientConnected()
             ban_duration = QDateTime::fromSecsSinceEpoch(ban.second.time).addSecs(ban.second.duration).toString("MM/dd/yyyy, hh:mm");
         }
         else {
-            ban_duration = "The heat death of the universe.";
+            ban_duration = "Permanently.";
         }
         AOPacket *ban_reason = PacketFactory::createPacket("BD", {"Reason: " + ban.second.reason + "\nBan ID: " + QString::number(ban.second.id) + "\nUntil: " + ban_duration});
         socket->sendTextMessage(ban_reason->toUtf8());

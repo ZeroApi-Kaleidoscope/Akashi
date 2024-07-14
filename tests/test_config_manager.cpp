@@ -54,8 +54,6 @@ class test_ConfigManager : public QObject
 
     void webaoEnabled();
 
-    void webaoPort();
-
     void authType();
 
     void modpass();

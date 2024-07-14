@@ -41,15 +41,10 @@ class NetworkSocket : public QObject
 
     /**
      * @brief Closes the socket by request of the child AOClient object or the server.
-     */
-    void close();
-
-    /**
-     * @brief Closes the socket by request of the child AOClient object or the server.
      *
      * @param The close code to the send to the client.
      */
-    void close(QWebSocketProtocol::CloseCode f_code);
+    void close(QWebSocketProtocol::CloseCode f_code = QWebSocketProtocol::CloseCodeNormal);
 
     /**
      * @brief Writes data to the network socket.
@@ -59,7 +54,6 @@ class NetworkSocket : public QObject
     void write(AOPacket *f_packet);
 
   Q_SIGNALS:
-
     /**
      * @brief handlePacket
      * @param f_packet
@@ -77,7 +71,7 @@ class NetworkSocket : public QObject
      *
      * @return Decoded AOPacket to be processed by the child AOClient object.
      */
-    void handleTextMessage(QString f_data);
+    void handleMessage(QString f_data);
 
   private:
     QWebSocket *m_client_socket;
@@ -88,22 +82,6 @@ class NetworkSocket : public QObject
      * @details In the case of the WebSocket we also check if this has been proxy forwarded.
      */
     QHostAddress m_socket_ip;
-
-    /**
-     * @brief Filled with part of a packet if said packet could not be read fully from the client's socket.
-     *
-     * @details Per AO2's network protocol, a packet is finished with the character `%`.
-     *
-     * @see #is_partial
-     */
-    QString m_partial_packet;
-
-    /**
-     * @brief True when the previous `readAll()` call from the client's socket returned an unfinished packet.
-     *
-     * @see #partial_packet
-     */
-    bool m_is_partial;
 };
 
 #endif

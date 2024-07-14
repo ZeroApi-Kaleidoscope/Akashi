@@ -54,9 +54,6 @@ bool ConfigManager::verifyServerConfig()
 
     // Verify areas
     QSettings l_areas_ini("config/areas.ini", QSettings::IniFormat);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    l_areas_ini.setIniCodec("UTF-8");
-#endif
     if (l_areas_ini.childGroups().length() < 1) {
         qCritical() << "areas.ini is invalid!";
         return false;
@@ -324,6 +321,11 @@ int ConfigManager::maxPlayers()
 
 int ConfigManager::serverPort()
 {
+    if (m_settings->contains("Options/webao_port")) {
+        qWarning("webao_port is deprecated, use port instead");
+        return m_settings->value("Options/webao_port", 27016).toInt();
+    }
+
     return m_settings->value("Options/port", 27016).toInt();
 }
 
@@ -340,6 +342,11 @@ QString ConfigManager::serverName()
 QString ConfigManager::motd()
 {
     return m_settings->value("Options/motd", "MOTD not set").toString();
+}
+
+bool ConfigManager::webaoEnabled()
+{
+    return m_settings->value("Options/webao_enable", false).toBool();
 }
 
 DataTypes::AuthType ConfigManager::authType()

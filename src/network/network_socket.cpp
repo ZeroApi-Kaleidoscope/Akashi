@@ -22,7 +22,7 @@ NetworkSocket::NetworkSocket(QWebSocket *f_socket, QObject *parent) :
     QObject(parent),
     m_client_socket(f_socket)
 {
-    connect(m_client_socket, &QWebSocket::textMessageReceived, this, &NetworkSocket::handleTextMessage);
+    connect(m_client_socket, &QWebSocket::textMessageReceived, this, &NetworkSocket::handleMessage);
     connect(m_client_socket, &QWebSocket::disconnected, this, &NetworkSocket::clientDisconnected);
 
     bool l_is_local = (m_client_socket->peerAddress() == QHostAddress::LocalHost) ||
@@ -41,7 +41,10 @@ NetworkSocket::NetworkSocket(QWebSocket *f_socket, QObject *parent) :
 
 NetworkSocket::~NetworkSocket()
 {
-    close();
+    disconnect(m_client_socket, &QWebSocket::textMessageReceived, this, &NetworkSocket::handleMessage);
+    disconnect(m_client_socket, &QWebSocket::disconnected, this, &NetworkSocket::clientDisconnected);
+
+    m_client_socket->deleteLater();
 }
 
 QHostAddress NetworkSocket::peerAddress()
@@ -49,17 +52,12 @@ QHostAddress NetworkSocket::peerAddress()
     return m_socket_ip;
 }
 
-void NetworkSocket::close()
-{
-    m_client_socket->deleteLater();
-}
-
 void NetworkSocket::close(QWebSocketProtocol::CloseCode f_code)
 {
     m_client_socket->close(f_code);
 }
 
-void NetworkSocket::handleTextMessage(QString f_data)
+void NetworkSocket::handleMessage(QString f_data)
 {
     QString l_data = f_data;
 
@@ -89,5 +87,4 @@ void NetworkSocket::handleTextMessage(QString f_data)
 void NetworkSocket::write(AOPacket *f_packet)
 {
     m_client_socket->sendTextMessage(f_packet->toString());
-    m_client_socket->flush();
 }
